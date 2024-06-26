@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  database:
+    container_name: saludos-database
+    environment:
+      - POSTGRES_DB=saludos
+      - POSTGRES_USER=saludos
+      - POSTGRES_PASSWORD=saludos
+    image: postgres:16.3
+    ports:
+      - "5433:5432"
+    volumes:
+      - saludos-database:/var/lib/postgresql/data
+
+  server:
+    build:
+      context: ./api_saludos
+    container_name: api_saludos
+    depends_on:
+      - database
+    environment:
+      - SQL_ENGINE=django.db.backends.postgresql
+      - SQL_DATABASE=saludos
+      - SQL_USER=saludos
+      - SQL_PASSWORD=saludos
+      - SQL_HOST=saludos-database
+      - SQL_PORT=5432
+    command: [ "bash", "start.sh" ]
+    ports:
+      - 8003:8000
+    volumes:
+      - ./api_saludos:/usr/src/app
+
+volumes:
+  saludos-database:
